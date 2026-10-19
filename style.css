@@ -1,0 +1,310 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  /* Photos average #f8f7f5; base is a touch lighter so SVG grain lands on that. */
+  background-color: #fcfbf9;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.06'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='fiber'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fiber)' opacity='0.035'/%3E%3C/svg%3E");
+  font-family: "Gochi Hand", "Comic Sans MS", cursive;
+  color: #3b3b3b;
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 36px) clamp(12px, 3vw, 28px) clamp(24px, 4vw, 48px);
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hint {
+  margin: 0.35em 0 clamp(8px, 2vw, 18px);
+  text-align: center;
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
+}
+
+.boxes,
+.desk {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.boxes {
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(4px, 1.5vw, 16px);
+}
+
+body.is-dragging .boxes {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+}
+
+.desk {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  align-items: start;
+  gap: clamp(8px, 2.5vw, 28px);
+  margin-top: clamp(8px, 2vw, 24px);
+}
+
+.mailbox-slot {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background: none;
+  cursor: pointer;
+}
+
+.mailbox-slot:focus,
+.mailbox-slot:focus-visible,
+.mailbox-slot:active {
+  outline: none;
+  background: none;
+}
+
+.mailbox-slot img,
+.desk img,
+.pad img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.mailbox-slot img {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.mailbox-slot.is-target img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 10px 10px rgba(70, 50, 20, 0.22));
+}
+
+.pad {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  container-type: inline-size;
+}
+
+.pad.is-away {
+  opacity: 0.28;
+}
+
+.pad.is-empty {
+  animation: wiggle 0.4s ease;
+}
+
+.lift {
+  position: absolute;
+  top: 3%;
+  left: 6%;
+  right: 6%;
+  height: 12%;
+  min-height: 40px;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.lift:focus {
+  outline: none;
+}
+
+.lift:active {
+  cursor: grabbing;
+}
+
+.pad textarea {
+  position: absolute;
+  top: 11.2%;
+  right: 9%;
+  bottom: 9.5%;
+  left: 19.5%;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  resize: none;
+  overflow: auto;
+  background: transparent;
+  color: #2a2a2a;
+  caret-color: #2a2a2a;
+  font-family: "Gochi Hand", "Comic Sans MS", cursive;
+  font-size: clamp(18px, 5.2cqi, 28px);
+  line-height: calc(60 / 784 * 100cqi);
+  outline: none;
+}
+
+.pad textarea::placeholder {
+  color: #9aa0a8;
+}
+
+.pens {
+  max-width: 460px;
+}
+
+.drag-ghost {
+  position: fixed;
+  width: min(280px, 55vw);
+  height: auto;
+  margin: 0;
+  pointer-events: none;
+  z-index: 20;
+  filter: drop-shadow(0 12px 16px rgba(60, 45, 20, 0.28));
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
+.inbox {
+  width: min(560px, 92vw);
+  max-height: min(80vh, 720px);
+  margin: auto;
+  padding: 1.15rem 1.2rem 1.3rem;
+  border: 3px solid #2a2a2a;
+  border-radius: 8px 16px 7px 14px;
+  background-color: #f8f7f5;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.06'/%3E%3C/svg%3E");
+  box-shadow: 4px 5px 0 #2a2a2a;
+  font-family: inherit;
+  color: #2a2a2a;
+}
+
+.inbox::backdrop {
+  background: rgba(40, 32, 24, 0.38);
+}
+
+.inbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0.9rem;
+}
+
+.inbox-header h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.inbox-close,
+.letter-remove {
+  appearance: none;
+  font: inherit;
+  color: #2a2a2a;
+  cursor: pointer;
+  border: 2.5px solid #2a2a2a;
+  background: #fff;
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  padding: 0.3em 0.95em;
+  box-shadow: 1px 2px 0 #2a2a2a;
+}
+
+.inbox-close:hover,
+.letter-remove:hover {
+  background: #f3efe8;
+}
+
+.inbox-list {
+  display: grid;
+  gap: 0.9rem;
+  overflow: auto;
+  max-height: 60vh;
+}
+
+.inbox-empty {
+  margin: 0.4rem 0;
+  text-align: center;
+}
+
+.inbox-letter {
+  position: relative;
+  margin: 0;
+  padding: 0.65rem 1rem 0.7rem 1.9rem;
+  border: 2.5px solid #2a2a2a;
+  border-radius: 4px 12px 6px 9px;
+  background-color: #fff;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgba(80, 140, 200, 0.42) 27px,
+    rgba(80, 140, 200, 0.42) 29px
+  );
+  box-shadow: 2px 3px 0 rgba(42, 42, 42, 0.12);
+}
+
+.inbox-letter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.25rem;
+  width: 2px;
+  background: #d4544a;
+}
+
+.inbox-letter p {
+  margin: 0 0 0.55rem;
+  white-space: pre-wrap;
+  font-size: 1.15rem;
+  line-height: 29px;
+}
+
+.inbox-letter footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #6a6a6a;
+  font-size: 0.9rem;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .boxes,
+  .desk {
+    grid-template-columns: minmax(0, 420px);
+    justify-content: center;
+  }
+
+  .pad,
+  .pens {
+    max-width: 480px;
+  }
+}

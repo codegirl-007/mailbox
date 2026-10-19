@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mailbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="boxes" aria-label="Mailboxes">
+        <button type="button" class="mailbox-slot" data-box="suggestions">
+          <img src="suggestions.jpg" alt="Suggestions box" />
+        </button>
+        <button type="button" class="mailbox-slot" data-box="letters">
+          <img src="letters.jpg" alt="Letters box" />
+        </button>
+        <button type="button" class="mailbox-slot" data-box="problems">
+          <img src="problems.jpg" alt="Problems box" />
+        </button>
+      </section>
+      <section class="desk" aria-label="Writing supplies">
+        <div class="pad" id="pad">
+          <img src="paper.jpg" alt="" />
+          <div class="lift" id="lift" role="button" tabindex="0" aria-label="Fold letter and drag to a mailbox"></div>
+          <textarea
+            id="letter"
+            maxlength="2000"
+            placeholder="Dear Mom and Dad,"
+            aria-label="Your letter"
+          ></textarea>
+        </div>
+        <img src="pens.jpg" class="pens" alt="" />
+      </section>
+    </main>
+    <dialog class="inbox" id="inbox" aria-labelledby="inbox-title">
+      <form method="dialog" class="inbox-header">
+        <h2 id="inbox-title">Mailbox</h2>
+        <button type="submit" class="inbox-close" aria-label="Close">Close</button>
+      </form>
+      <div class="inbox-list" id="inbox-list"></div>
+    </dialog>
+    <script src="mailbox.js"></script>
+  </body>
+</html>
