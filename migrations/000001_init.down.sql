@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS letters;
+DROP TABLE IF EXISTS users;
