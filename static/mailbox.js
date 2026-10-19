@@ -5,6 +5,12 @@ const BOX_TITLES = {
   problems: "Problems",
 };
 
+const bus = new EventTarget();
+
+function emit(type, detail) {
+  bus.dispatchEvent(new CustomEvent(type, { detail }));
+}
+
 const pad = document.getElementById("pad");
 const lift = document.getElementById("lift");
 const letterInput = document.getElementById("letter");
@@ -57,36 +63,25 @@ function endDrag(x, y) {
   document.body.classList.remove("is-dragging");
   pad.classList.remove("is-away");
   highlightSlot(null);
+  ghost.remove();
 
   if (slot) {
-    const box = slot.dataset.box;
-    const data = loadLetters();
-    data[box].unshift({
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      text,
-      at: Date.now(),
-    });
-    saveLetters(data);
-    letterInput.value = "";
-    ghost.remove();
     ignoreClick = true;
     setTimeout(() => {
       ignoreClick = false;
     }, 0);
+    emit("drop", { box: slot.dataset.box, text });
     return;
   }
 
-  ghost.remove();
+  emit("cancel", { text });
 }
 
 function startDrag(event) {
   if (drag) return;
   const text = letterInput.value.trim();
   if (!text) {
-    pad.classList.remove("is-empty");
-    void pad.offsetWidth;
-    pad.classList.add("is-empty");
-    letterInput.focus();
+    emit("empty");
     return;
   }
 
@@ -108,6 +103,7 @@ function startDrag(event) {
   }
   moveGhost(event.clientX, event.clientY);
   highlightSlot(slotFromPoint(event.clientX, event.clientY));
+  emit("dragstart", { text });
 }
 
 function onDown(event) {
@@ -199,7 +195,30 @@ function renderInbox(box) {
 slots.forEach((slot) => {
   slot.addEventListener("click", () => {
     if (drag || ignoreClick) return;
-    renderInbox(slot.dataset.box);
-    inbox.showModal();
+    emit("open", { box: slot.dataset.box });
   });
+});
+
+bus.addEventListener("empty", () => {
+  pad.classList.remove("is-empty");
+  void pad.offsetWidth;
+  pad.classList.add("is-empty");
+  letterInput.focus();
+});
+
+bus.addEventListener("drop", (event) => {
+  const { box, text } = event.detail;
+  const data = loadLetters();
+  data[box].unshift({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    text,
+    at: Date.now(),
+  });
+  saveLetters(data);
+  letterInput.value = "";
+});
+
+bus.addEventListener("open", (event) => {
+  renderInbox(event.detail.box);
+  inbox.showModal();
 });
